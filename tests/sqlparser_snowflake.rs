@@ -4082,3 +4082,31 @@ fn parse_connect_by_root_operator() {
         "sql parser error: Expected an expression, found: FROM"
     );
 }
+
+#[test]
+fn test_snowflake_create_view_if_not_exists() {
+    // This test verifies that CREATE VIEW IF NOT EXISTS works with Snowflake dialect
+    let sql = "CREATE VIEW IF NOT EXISTS my_database.my_schema.simple_view AS SELECT id, name, created_at FROM my_database.my_schema.users WHERE is_active = TRUE";
+
+    let result = snowflake().parse_sql_statements(sql);
+    assert!(
+        result.is_ok(),
+        "Expected CREATE VIEW IF NOT EXISTS to work with Snowflake dialect"
+    );
+
+    // Verify the parsed result
+    match result.unwrap().first().unwrap() {
+        Statement::CreateView {
+            name,
+            if_not_exists,
+            query,
+            ..
+        } => {
+            assert_eq!("my_database.my_schema.simple_view", name.to_string());
+            assert!(if_not_exists);
+            // Note: The parser normalizes TRUE to true, so we check for the normalized version
+            assert_eq!("SELECT id, name, created_at FROM my_database.my_schema.users WHERE is_active = true", query.to_string());
+        }
+        _ => unreachable!(),
+    }
+}
