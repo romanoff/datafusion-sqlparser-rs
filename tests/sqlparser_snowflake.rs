@@ -4110,3 +4110,35 @@ fn test_snowflake_create_view_if_not_exists() {
         _ => unreachable!(),
     }
 }
+
+#[test]
+fn test_snowflake_timestamp_ntz_with_precision() {
+    // This test verifies that TIMESTAMP_NTZ(9) works with Snowflake dialect
+    let sql = "SELECT CAST(TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD')||' 01:00:00' AS TIMESTAMP_NTZ(9))";
+
+    let result = snowflake().parse_sql_statements(sql);
+    assert!(
+        result.is_ok(),
+        "Expected TIMESTAMP_NTZ(9) to parse successfully with Snowflake dialect"
+    );
+
+    // Verify the parsed result
+    match result.unwrap().first().unwrap() {
+        Statement::Query(query) => match query.body.as_select() {
+            Some(select) => {
+                assert_eq!(select.projection.len(), 1);
+                match &select.projection[0] {
+                    SelectItem::UnnamedExpr(Expr::Cast { data_type, .. }) => match data_type {
+                        DataType::TimestampNtz(precision) => {
+                            assert_eq!(*precision, Some(9));
+                        }
+                        _ => panic!("Expected DataType::TimestampNtz with precision"),
+                    },
+                    _ => panic!("Expected a Cast expression"),
+                }
+            }
+            _ => panic!("Expected a Select query"),
+        },
+        _ => panic!("Expected a Query statement"),
+    }
+}

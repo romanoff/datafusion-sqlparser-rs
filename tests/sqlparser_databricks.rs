@@ -327,7 +327,7 @@ fn data_type_timestamp_ntz() {
     assert_eq!(
         databricks().verified_expr("TIMESTAMP_NTZ '2025-03-29T18:52:00'"),
         Expr::TypedString {
-            data_type: DataType::TimestampNtz,
+            data_type: DataType::TimestampNtz(None),
             value: Value::SingleQuotedString("2025-03-29T18:52:00".to_owned())
         }
     );
@@ -340,7 +340,7 @@ fn data_type_timestamp_ntz() {
             expr: Box::new(Expr::Nested(Box::new(Expr::Identifier(
                 "created_at".into()
             )))),
-            data_type: DataType::TimestampNtz,
+            data_type: DataType::TimestampNtz(None),
             format: None
         }
     );
@@ -352,7 +352,7 @@ fn data_type_timestamp_ntz() {
                 columns,
                 vec![ColumnDef {
                     name: "x".into(),
-                    data_type: DataType::TimestampNtz,
+                    data_type: DataType::TimestampNtz(None),
                     options: vec![],
                 }]
             );
