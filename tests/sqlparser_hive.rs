@@ -566,3 +566,8 @@ fn hive() -> TestedDialects {
 fn hive_and_generic() -> TestedDialects {
     TestedDialects::new(vec![Box::new(HiveDialect {}), Box::new(GenericDialect {})])
 }
+
+#[test]
+fn parse_create_external_table_without_location() {
+    hive().verified_stmt("CREATE EXTERNAL TABLE t (c INT)");
+}
