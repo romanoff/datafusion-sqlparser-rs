@@ -507,21 +507,29 @@ fn test_create_table_compound_sortkey() {
         "CREATE TABLE sales (sale_id INT, sale_date DATE) COMPOUND SORTKEY(sale_date, sale_id)",
     );
 
-    redshift().verified_stmt(
-        "CREATE TABLE t1 (c1 INT, c2 INT) DISTSTYLE EVEN COMPOUND SORTKEY(c1, c2)",
-    );
+    redshift()
+        .verified_stmt("CREATE TABLE t1 (c1 INT, c2 INT) DISTSTYLE EVEN COMPOUND SORTKEY(c1, c2)");
 }
 
 #[test]
 fn test_create_table_interleaved_sortkey() {
-    redshift().verified_stmt(
-        "CREATE TABLE t1 (c1 INT, c2 INT) INTERLEAVED SORTKEY(c1, c2)",
-    );
+    redshift().verified_stmt("CREATE TABLE t1 (c1 INT, c2 INT) INTERLEAVED SORTKEY(c1, c2)");
 }
 
 #[test]
 fn test_create_table_sortkey_auto() {
     redshift().verified_stmt("CREATE TABLE t1 (c1 INT, c2 INT) SORTKEY AUTO");
+}
+
+#[test]
+fn test_create_table_encode() {
+    redshift().verified_stmt(
+        "CREATE TABLE t1 (c1 INTEGER ENCODE az64, c2 VARCHAR(100) ENCODE bytedict, c3 BOOLEAN ENCODE raw)",
+    );
+
+    redshift().verified_stmt(
+        "CREATE TABLE t1 (c1 INT ENCODE az64 NOT NULL, c2 VARCHAR(100) ENCODE lzo DEFAULT 'x')",
+    );
 }
 
 #[test]

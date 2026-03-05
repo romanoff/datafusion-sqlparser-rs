@@ -361,6 +361,7 @@ define_keywords!(
     EMPTYASNULL,
     ENABLE,
     ENABLE_SCHEMA_EVOLUTION,
+    ENCODE,
     ENCODING,
     ENCRYPTED,
     ENCRYPTION,
