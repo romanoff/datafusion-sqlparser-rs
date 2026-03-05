@@ -502,6 +502,29 @@ fn test_alter_table_alter_sortkey() {
 }
 
 #[test]
+fn test_create_table_compound_sortkey() {
+    redshift().verified_stmt(
+        "CREATE TABLE sales (sale_id INT, sale_date DATE) COMPOUND SORTKEY(sale_date, sale_id)",
+    );
+
+    redshift().verified_stmt(
+        "CREATE TABLE t1 (c1 INT, c2 INT) DISTSTYLE EVEN COMPOUND SORTKEY(c1, c2)",
+    );
+}
+
+#[test]
+fn test_create_table_interleaved_sortkey() {
+    redshift().verified_stmt(
+        "CREATE TABLE t1 (c1 INT, c2 INT) INTERLEAVED SORTKEY(c1, c2)",
+    );
+}
+
+#[test]
+fn test_create_table_sortkey_auto() {
+    redshift().verified_stmt("CREATE TABLE t1 (c1 INT, c2 INT) SORTKEY AUTO");
+}
+
+#[test]
 fn test_create_table_backup() {
     redshift().verified_stmt("CREATE TABLE public.users (id INT, name VARCHAR(255)) BACKUP YES");
 

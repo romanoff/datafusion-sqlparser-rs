@@ -8406,11 +8406,27 @@ impl<'a> Parser<'a> {
         } else {
             None
         };
-        let sortkey = if self.parse_keyword(Keyword::SORTKEY) {
+        let sortkey = if self.parse_keyword(Keyword::COMPOUND) {
+            self.expect_keyword_is(Keyword::SORTKEY)?;
             self.expect_token(&Token::LParen)?;
             let columns = self.parse_comma_separated(|p| p.parse_expr())?;
             self.expect_token(&Token::RParen)?;
-            Some(columns)
+            Some(CreateTableSortKey::Compound { columns })
+        } else if self.parse_keyword(Keyword::INTERLEAVED) {
+            self.expect_keyword_is(Keyword::SORTKEY)?;
+            self.expect_token(&Token::LParen)?;
+            let columns = self.parse_comma_separated(|p| p.parse_expr())?;
+            self.expect_token(&Token::RParen)?;
+            Some(CreateTableSortKey::Interleaved { columns })
+        } else if self.parse_keyword(Keyword::SORTKEY) {
+            if self.parse_keyword(Keyword::AUTO) {
+                Some(CreateTableSortKey::Auto)
+            } else {
+                self.expect_token(&Token::LParen)?;
+                let columns = self.parse_comma_separated(|p| p.parse_expr())?;
+                self.expect_token(&Token::RParen)?;
+                Some(CreateTableSortKey::Plain { columns })
+            }
         } else {
             None
         };

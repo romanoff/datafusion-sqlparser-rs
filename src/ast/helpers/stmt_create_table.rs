@@ -26,7 +26,8 @@ use sqlparser_derive::{Visit, VisitMut};
 
 use crate::ast::{
     ClusteredBy, ColumnDef, CommentDef, CreateTable, CreateTableLikeKind, CreateTableOptions,
-    DistStyle, Expr, FileFormat, ForValues, HiveDistributionStyle, HiveFormat, Ident,
+    CreateTableSortKey, DistStyle, Expr, FileFormat, ForValues, HiveDistributionStyle, HiveFormat,
+    Ident,
     InitializeKind, ObjectName, OnCommit, OneOrManyWithParens, Query, RefreshModeKind,
     RowAccessPolicy, Statement, StorageSerializationPolicy, TableConstraint, TableVersion, Tag,
     WrappedCollection,
@@ -176,7 +177,7 @@ pub struct CreateTableBuilder {
     /// Redshift `DISTKEY` option.
     pub distkey: Option<Expr>,
     /// Redshift `SORTKEY` option.
-    pub sortkey: Option<Vec<Expr>>,
+    pub sortkey: Option<CreateTableSortKey>,
     /// Redshift `BACKUP` option.
     pub backup: Option<bool>,
 }
@@ -528,7 +529,7 @@ impl CreateTableBuilder {
         self
     }
     /// Set Redshift `SORTKEY` option.
-    pub fn sortkey(mut self, sortkey: Option<Vec<Expr>>) -> Self {
+    pub fn sortkey(mut self, sortkey: Option<CreateTableSortKey>) -> Self {
         self.sortkey = sortkey;
         self
     }

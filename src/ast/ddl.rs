@@ -3048,9 +3048,9 @@ pub struct CreateTable {
     /// Redshift `DISTKEY` option
     /// <https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html>
     pub distkey: Option<Expr>,
-    /// Redshift `SORTKEY` option
+    /// Redshift `[COMPOUND | INTERLEAVED] SORTKEY (col, ...) | SORTKEY AUTO`
     /// <https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html>
-    pub sortkey: Option<Vec<Expr>>,
+    pub sortkey: Option<CreateTableSortKey>,
     /// Redshift `BACKUP` option: `BACKUP { YES | NO }`
     /// <https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html>
     pub backup: Option<bool>,
@@ -3362,7 +3362,7 @@ impl fmt::Display for CreateTable {
             write!(f, " DISTKEY({distkey})")?;
         }
         if let Some(sortkey) = &self.sortkey {
-            write!(f, " SORTKEY({})", display_comma_separated(sortkey))?;
+            write!(f, " {sortkey}")?;
         }
         if let Some(query) = &self.query {
             write!(f, " AS {query}")?;
@@ -3475,6 +3475,55 @@ impl fmt::Display for DistStyle {
             DistStyle::Even => write!(f, "EVEN"),
             DistStyle::Key => write!(f, "KEY"),
             DistStyle::All => write!(f, "ALL"),
+        }
+    }
+}
+
+/// Redshift sort key definition for `CREATE TABLE`.
+///
+/// Syntax: `[COMPOUND | INTERLEAVED] SORTKEY (column [, ...]) | SORTKEY AUTO`
+///
+/// See [Redshift](https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html)
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "visitor", derive(Visit, VisitMut))]
+pub enum CreateTableSortKey {
+    /// `SORTKEY AUTO`
+    Auto,
+    /// `SORTKEY (column [, ...])` — plain (defaults to compound in Redshift)
+    Plain {
+        /// Sort key columns.
+        columns: Vec<Expr>,
+    },
+    /// `COMPOUND SORTKEY (column [, ...])`
+    Compound {
+        /// Sort key columns.
+        columns: Vec<Expr>,
+    },
+    /// `INTERLEAVED SORTKEY (column [, ...])`
+    Interleaved {
+        /// Sort key columns.
+        columns: Vec<Expr>,
+    },
+}
+
+impl fmt::Display for CreateTableSortKey {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            CreateTableSortKey::Auto => write!(f, "SORTKEY AUTO"),
+            CreateTableSortKey::Plain { columns } => {
+                write!(f, "SORTKEY({})", display_comma_separated(columns))
+            }
+            CreateTableSortKey::Compound { columns } => {
+                write!(f, "COMPOUND SORTKEY({})", display_comma_separated(columns))
+            }
+            CreateTableSortKey::Interleaved { columns } => {
+                write!(
+                    f,
+                    "INTERLEAVED SORTKEY({})",
+                    display_comma_separated(columns)
+                )
+            }
         }
     }
 }
