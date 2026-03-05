@@ -9220,6 +9220,15 @@ pub enum CopyLegacyOption {
     /// Redshift `CREDENTIALS 'auth-args'`
     /// <https://docs.aws.amazon.com/redshift/latest/dg/copy-parameters-authorization.html>
     Credentials(String),
+    /// Redshift `ACCESS_KEY_ID 'access-key-id'`
+    /// <https://docs.aws.amazon.com/redshift/latest/dg/copy-parameters-authorization.html>
+    AccessKeyId(String),
+    /// Redshift `SECRET_ACCESS_KEY 'secret-access-key'`
+    /// <https://docs.aws.amazon.com/redshift/latest/dg/copy-parameters-authorization.html>
+    SecretAccessKey(String),
+    /// Redshift `SESSION_TOKEN 'session-token'`
+    /// <https://docs.aws.amazon.com/redshift/latest/dg/copy-parameters-authorization.html>
+    SessionToken(String),
 }
 
 impl fmt::Display for CopyLegacyOption {
@@ -9331,6 +9340,23 @@ impl fmt::Display for CopyLegacyOption {
             TruncateColumns => write!(f, "TRUNCATECOLUMNS"),
             Zstd => write!(f, "ZSTD"),
             Credentials(s) => write!(f, "CREDENTIALS '{}'", value::escape_single_quote_string(s)),
+            AccessKeyId(s) => {
+                write!(
+                    f,
+                    "ACCESS_KEY_ID '{}'",
+                    value::escape_single_quote_string(s)
+                )
+            }
+            SecretAccessKey(s) => write!(
+                f,
+                "SECRET_ACCESS_KEY '{}'",
+                value::escape_single_quote_string(s)
+            ),
+            SessionToken(s) => write!(
+                f,
+                "SESSION_TOKEN '{}'",
+                value::escape_single_quote_string(s)
+            ),
         }
     }
 }

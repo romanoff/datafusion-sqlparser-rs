@@ -11223,6 +11223,7 @@ impl<'a> Parser<'a> {
         let ret = match self.parse_one_of_keywords(&[
             Keyword::ACCEPTANYDATE,
             Keyword::ACCEPTINVCHARS,
+            Keyword::ACCESS_KEY_ID,
             Keyword::ADDQUOTES,
             Keyword::ALLOWOVERWRITE,
             Keyword::BINARY,
@@ -11253,6 +11254,8 @@ impl<'a> Parser<'a> {
             Keyword::REGION,
             Keyword::REMOVEQUOTES,
             Keyword::ROWGROUPSIZE,
+            Keyword::SECRET_ACCESS_KEY,
+            Keyword::SESSION_TOKEN,
             Keyword::STATUPDATE,
             Keyword::TIMEFORMAT,
             Keyword::TRUNCATECOLUMNS,
@@ -11267,6 +11270,9 @@ impl<'a> Parser<'a> {
                     None
                 };
                 CopyLegacyOption::AcceptInvChars(ch)
+            }
+            Some(Keyword::ACCESS_KEY_ID) => {
+                CopyLegacyOption::AccessKeyId(self.parse_literal_string()?)
             }
             Some(Keyword::ADDQUOTES) => CopyLegacyOption::AddQuotes,
             Some(Keyword::ALLOWOVERWRITE) => CopyLegacyOption::AllowOverwrite,
@@ -11388,6 +11394,12 @@ impl<'a> Parser<'a> {
                 CopyLegacyOption::Region(region)
             }
             Some(Keyword::REMOVEQUOTES) => CopyLegacyOption::RemoveQuotes,
+            Some(Keyword::SECRET_ACCESS_KEY) => {
+                CopyLegacyOption::SecretAccessKey(self.parse_literal_string()?)
+            }
+            Some(Keyword::SESSION_TOKEN) => {
+                CopyLegacyOption::SessionToken(self.parse_literal_string()?)
+            }
             Some(Keyword::ROWGROUPSIZE) => {
                 let _ = self.parse_keyword(Keyword::AS);
                 let file_size = self.parse_file_size()?;

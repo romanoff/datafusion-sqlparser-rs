@@ -542,3 +542,14 @@ fn test_create_table_backup() {
         "CREATE TABLE public.users_backup_test BACKUP YES DISTSTYLE AUTO AS SELECT id, name, email FROM public.users",
     );
 }
+
+#[test]
+fn test_unload_auth_options() {
+    redshift().verified_stmt(
+        "UNLOAD('SELECT * FROM t') TO 's3://bucket/path/' ACCESS_KEY_ID 'ak' SECRET_ACCESS_KEY 'sk' SESSION_TOKEN 'tok' CSV PARALLEL FALSE ALLOWOVERWRITE",
+    );
+
+    redshift().verified_stmt(
+        "UNLOAD('SELECT * FROM t') TO 's3://bucket/path/' ACCESS_KEY_ID 'ak' SECRET_ACCESS_KEY 'sk'",
+    );
+}
