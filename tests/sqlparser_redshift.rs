@@ -581,3 +581,12 @@ fn test_create_materialized_view_auto_refresh() {
         "CREATE MATERIALIZED VIEW mv1 AS (SELECT MAX(id) AS max_id FROM t1)",
     );
 }
+
+#[test]
+fn test_create_table_with_column_distkey_sortkey() {
+    redshift().verified_stmt(
+        "CREATE TABLE #player_activity (date DATE ENCODE raw DISTKEY NOT NULL, userid INTEGER ENCODE az64 NOT NULL) DISTSTYLE KEY SORTKEY(date, userid)",
+    );
+
+    redshift().verified_stmt("CREATE TABLE t1 (c1 INT DISTKEY, c2 INT SORTKEY)");
+}

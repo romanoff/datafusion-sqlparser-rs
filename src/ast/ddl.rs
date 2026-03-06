@@ -2008,6 +2008,20 @@ pub enum ColumnOption {
     /// ```
     /// [Redshift]: https://docs.aws.amazon.com/redshift/latest/dg/c_Compression_encodings.html
     Encode(Ident),
+    /// Redshift specific: Column-level `DISTKEY` attribute
+    /// Syntax:
+    /// ```sql
+    /// CREATE TABLE t (c1 INT DISTKEY);
+    /// ```
+    /// [Redshift]: https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html
+    DistKey,
+    /// Redshift specific: Column-level `SORTKEY` attribute
+    /// Syntax:
+    /// ```sql
+    /// CREATE TABLE t (c1 INT SORTKEY);
+    /// ```
+    /// [Redshift]: https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_TABLE_NEW.html
+    SortKey,
 }
 
 impl From<UniqueConstraint> for ColumnOption {
@@ -2160,6 +2174,8 @@ impl fmt::Display for ColumnOption {
             Encode(encoding) => {
                 write!(f, "ENCODE {encoding}")
             }
+            DistKey => write!(f, "DISTKEY"),
+            SortKey => write!(f, "SORTKEY"),
         }
     }
 }
