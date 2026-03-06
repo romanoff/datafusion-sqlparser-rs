@@ -553,3 +553,15 @@ fn test_unload_auth_options() {
         "UNLOAD('SELECT * FROM t') TO 's3://bucket/path/' ACCESS_KEY_ID 'ak' SECRET_ACCESS_KEY 'sk'",
     );
 }
+
+#[test]
+fn test_create_table_as_with_column_names() {
+    redshift().verified_stmt(
+        "CREATE TEMPORARY TABLE volt_tt (userid, days_played_in_last_31) AS SELECT 1, 2",
+    );
+    // TEMP is an alias for TEMPORARY
+    redshift().one_statement_parses_to(
+        "CREATE TEMP TABLE volt_tt(userid, days_played_in_last_31) AS SELECT 1, 2",
+        "CREATE TEMPORARY TABLE volt_tt (userid, days_played_in_last_31) AS SELECT 1, 2",
+    );
+}
