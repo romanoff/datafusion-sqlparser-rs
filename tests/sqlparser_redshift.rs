@@ -565,3 +565,19 @@ fn test_create_table_as_with_column_names() {
         "CREATE TEMPORARY TABLE volt_tt (userid, days_played_in_last_31) AS SELECT 1, 2",
     );
 }
+
+#[test]
+fn test_create_materialized_view_auto_refresh() {
+    redshift().verified_stmt(
+        "CREATE MATERIALIZED VIEW mv1 AUTO REFRESH YES AS (SELECT MAX(id) AS max_id FROM t1)",
+    );
+
+    redshift().verified_stmt(
+        "CREATE MATERIALIZED VIEW mv1 AUTO REFRESH NO AS (SELECT MAX(id) AS max_id FROM t1)",
+    );
+
+    // Without AUTO REFRESH
+    redshift().verified_stmt(
+        "CREATE MATERIALIZED VIEW mv1 AS (SELECT MAX(id) AS max_id FROM t1)",
+    );
+}
